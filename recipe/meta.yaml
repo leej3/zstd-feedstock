@@ -11,7 +11,13 @@ source:
   sha256: f176f0626cb797022fbf257c3c644d71c1c747bb74c32201f9203654da35e9fa
 
 build:
+{% if bootstrapping == 'yes' %}
+  number: 0
+  string: h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}_bootstrapping
+{% else %}
+  # Keep above the number of the _bootstrapping package
   number: 1
+{% endif %}
   run_exports:
     # pretty bad removal of symbols in every other micro release:
     #   https://abi-laboratory.pro/tracker/timeline/zstd/
@@ -25,7 +31,9 @@ requirements:
     - msinttypes  # [win]
     - make   # [unix]
     - ninja  # [win]
+{% if bootstrapping != 'yes' %}
     - cmake
+{% endif %}
   host:
     - zlib
     - xz
@@ -70,7 +78,9 @@ outputs:
         - msinttypes  # [win]
         - make   # [unix]
         - ninja  # [win]
+{% if bootstrapping != 'yes' %}
         - cmake
+{% endif %}
       host:
         - {{ pin_subpackage('zstd', exact=True) }}
       run:
